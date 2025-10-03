@@ -19,18 +19,18 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.15); 
 
         }
-        .status-approved { 
-            color: green; font-weight: bold;
-
-        /*}*/
-        .status-pending { 
-            color: orange; font-weight: bold; 
-
+        .status-approved {
+            color: green;
+            font-weight: bold;
         }
-        .status-rejected { 
-        .status-rejected { 
-            color: red; font-weight: bold;
+        .status-pending {
+            color: orange;
+            font-weight: bold;
+        }
 
+        .status-rejected {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -60,7 +60,8 @@
                                     string loanId = br["LoanID"].ToString();
                                     string amount = Convert.ToDecimal(br["Amount"]).ToString("₹#,##0.00");
                                     string status = br["Status"].ToString();
-                                    string Loantype = br["Loantype"]ToString();
+                                    string loanType = br["LoanType"].ToString(); 
+
                                     string dateApplied = Convert.ToDateTime(br["DateApplied"]).ToString("yyyy-MM-dd");
 
                                     string statusClass = "";
@@ -76,8 +77,10 @@
                     <div class="card loan-card">
                         <div class="card-body">
                             <h5 class="card-title">Loan ID: <%= loanId %></h5>
-                            <p class="card-text">Amount: <%= amount %></p>
+                            <p class="card-text"style="color:#808080">Amount: <%= amount %></p>
                             <p class="card-text">Date Applied: <%= dateApplied %></p>
+                            <p class="card-text"style="color:Purple">Loan Type: <%= loanType %></p>
+
                             <p class="card-text <%= statusClass %>">Status: <%= status %> <%= statusIcon %></p>
                         </div>
                     </div>
