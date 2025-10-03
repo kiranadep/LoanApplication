@@ -69,12 +69,11 @@
   <ItemGroup>
     <Content Include="Admin\Admin.aspx" />
     <Content Include="Admin\AdminDashboard.aspx" />
-    <Content Include="ApplyLoan.aspx" />
+    <Content Include="db\LoanGlobal.sql" />
     <Content Include="Global.asax" />
     <Content Include="LoanHistry\LoanHistory.aspx" />
     <Content Include="LoanHistry\use.aspx" />
     <Content Include="LoanHistry\userlogindb.aspx" />
-    <Content Include="ViewLoan.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -91,13 +90,6 @@
     </Compile>
     <Compile Include="Admin\AdminDashboard.aspx.designer.cs">
       <DependentUpon>AdminDashboard.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="ApplyLoan.aspx.cs">
-      <DependentUpon>ApplyLoan.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ApplyLoan.aspx.designer.cs">
-      <DependentUpon>ApplyLoan.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -124,13 +116,6 @@
       <DependentUpon>userlogindb.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewLoan.aspx.cs">
-      <DependentUpon>ViewLoan.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ViewLoan.aspx.designer.cs">
-      <DependentUpon>ViewLoan.aspx</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
