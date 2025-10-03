@@ -44,7 +44,7 @@
                 {
                     int userId = Convert.ToInt32(Session["UserID"]);
                     string connectionString = "Data Source=LAPTOP-P2EGJFP1\\SQLEXPRESS;Initial Catalog=Loan;Integrated Security=True;";
-                    string query = "SELECT LoanID, Amount, Status, DateApplied FROM LoanHistry WHERE UserID=@UserID ORDER BY DateApplied DESC";
+                    string query = "SELECT LoanID, Amount, Status, DateApplied, LoanType FROM LoanHistry WHERE UserID=@UserID ORDER BY DateApplied DESC";
 
                     using(SqlConnection con = new SqlConnection(connectionString))
                     using(SqlCommand cmd = new SqlCommand(query, con))
@@ -60,6 +60,7 @@
                                     string loanId = br["LoanID"].ToString();
                                     string amount = Convert.ToDecimal(br["Amount"]).ToString("₹#,##0.00");
                                     string status = br["Status"].ToString();
+                                    string Loantype = br["Loantype"]ToString();
                                     string dateApplied = Convert.ToDateTime(br["DateApplied"]).ToString("yyyy-MM-dd");
 
                                     string statusClass = "";
