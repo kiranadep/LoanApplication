@@ -8,44 +8,25 @@
 </head>
 <body>          
 <%
-    string username = Request.Form["t1"];
-    string password = Request.Form["t2"];
+  
 
-    if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-    {
-        Response.Redirect("userlogin.aspx");
-        return;
-    }
+    
 
 
-    string path = "Data Source=LAPTOP-P2EGJFP1\\SQLEXPRESS;Initial Catalog=loan;Integrated Security=True;";
+    string path = "Data Source=LAPTOP-8665JUUD\\SQLEXPRESS;Initial Catalog=LoanDB1;Integrated Security=True;";
 
     SqlConnection con = new SqlConnection(path);
 
 
 
-    SqlCommand cmd = new SqlCommand("select * from Users where Username ='" + username + "' and Password ='" + password + "'", con);
-
-    cmd.Parameters.AddWithValue("@Username", username);
-    cmd.Parameters.AddWithValue("@Password", password);
+    SqlCommand cmd = new SqlCommand("select * from Users where FullName ='" +  + "' and Password ='" + + "'", con);
 
     con.Open();
 
     SqlDataReader br = cmd.ExecuteReader(); // get UserID
 
-    if (br.Read())
-    {
-        // ✅ Set session for LoanHistory.aspx
-        Session["UserID"] = Convert.ToInt32(br["UserID"]);
-        Response.Redirect("../LoanHistry/LoanHistory.aspx");
-    }
-    else
-    {
-        Session["LoginError"] = "You entered wrong username or password";
-        Response.Redirect("use.aspx");
-
-    }
-
+        Response.Redirect("../Loans/userview/.aspx");
+  
 
 
 

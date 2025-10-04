@@ -256,8 +256,8 @@
         <div class="header">
             <div class="logo">💰 LoanHub</div>
             <div class="auth-buttons">
-                <button type="button" class="btn-login" onclick="window.location.href='login.aspx'">Login</button>
-                <button type="button" class="btn-signup" onclick="window.location.href='signup.aspx'">Sign Up</button>
+                <button type="button" class="btn-login" onclick="window.location.href='../user/login.aspx'">Login</button>
+                <button type="button" class="btn-signup" onclick="window.location.href='../user/Register.aspx'">Register</button>
             </div>
         </div>
 

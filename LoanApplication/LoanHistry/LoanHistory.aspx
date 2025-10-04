@@ -43,7 +43,7 @@
                 if (Session["UserID"] != null)
                 {
                     int userId = Convert.ToInt32(Session["UserID"]);
-                    string connectionString = "Data Source=LAPTOP-P2EGJFP1\\SQLEXPRESS;Initial Catalog=Loan;Integrated Security=True;";
+                    string connectionString = "Data Source=LAPTOP-P2EGJFP1\\SQLEXPRESS;Initial Catalog=loan;Integrated Security=True;";
                     string query = "SELECT LoanID, Amount, Status, DateApplied FROM LoanHistry WHERE UserID=@UserID ORDER BY DateApplied DESC";
 
                     using(SqlConnection con = new SqlConnection(connectionString))

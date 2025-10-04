@@ -7,11 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace LoanApplication
+namespace LoanApplication.User
 {
 
 
-    public partial class ViewLoan
+    public partial class Register
     {
     }
 }
