@@ -1,7 +1,7 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="login.aspx.cs" Inherits="LoanApplication.User.login" %>
 <%@ Import Namespace="System.Configuration" %>
 <%@ Import Namespace="System.Data" %>
-<%@ Import Namespace="System.Data.SqlClient" %>
+<%@ Import Namespace="MySql.Data.MySqlClient" %>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
@@ -121,12 +121,12 @@
             <%
                 string errorMessage = "";
                 string successMessage = "";
-                
+
                 if (IsPostBack)
                 {
                     string email = Request.Form["txtEmail"];
                     string password = Request.Form["txtPassword"];
-                    
+
                     if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                     {
                         errorMessage = "Please enter email and password.";
@@ -135,44 +135,43 @@
                     {
                         try
                         {
-                            // SSMS Connection string - SAME AS ADMIN AND REGISTER
-                            string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"].ConnectionString;
-                            
-                            using (SqlConnection con = new SqlConnection(connStr))
+                            string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
+                            if (string.IsNullOrEmpty(connStr))
+                                throw new Exception("Connection string 'LoanAppDB' not found in Web.config!");
+
+                            using (MySqlConnection con = new MySqlConnection(connStr))
                             {
-                                string query = "SELECT UserID, FullName, Email FROM Users WHERE Email=@email AND Password=@password";
+                                string query = "SELECT ID, FullName, Email FROM Users WHERE Email=@email AND Password=@password";
                                 
-                                using (SqlCommand cmd = new SqlCommand(query, con))
+                                using (MySqlCommand cmd = new MySqlCommand(query, con))
                                 {
                                     cmd.Parameters.AddWithValue("@email", email);
                                     cmd.Parameters.AddWithValue("@password", password);
-                                    
+
                                     con.Open();
-                                    SqlDataReader reader = cmd.ExecuteReader();
-                                    
-                                    if (reader.Read())
+                                    using (MySqlDataReader reader = cmd.ExecuteReader())
                                     {
-                                        // Login successful - Store user info in session
-                                        Session["UserID"] = reader["UserID"].ToString();
-                                        Session["UserName"] = reader["FullName"].ToString();
-                                        Session["UserEmail"] = reader["Email"].ToString();
-                                        
-                                        reader.Close();
-                                        con.Close();
-                                        
-                                        // Redirect to user dashboard
-                                        Response.Redirect("../Loans/userview.aspx");
-                                    }
-                                    else
-                                    {
-                                        reader.Close();
-                                        con.Close();
-                                        errorMessage = "Invalid email or password!";
+                                        if (reader.Read())
+                                        {
+                                            // Login successful - store session
+                                            Session["UserID"] = reader["ID"].ToString();
+                                            Session["UserName"] = reader["FullName"].ToString();
+                                            Session["UserEmail"] = reader["Email"].ToString();
+
+                                            reader.Close();
+                                            con.Close();
+
+                                            Response.Redirect("../Loans/userview.aspx");
+                                        }
+                                        else
+                                        {
+                                            errorMessage = "Invalid email or password!";
+                                        }
                                     }
                                 }
                             }
                         }
-                        catch (SqlException sqlEx)
+                        catch (MySqlException sqlEx)
                         {
                             errorMessage = "Database Error: " + sqlEx.Message;
                         }
@@ -183,11 +182,11 @@
                     }
                 }
             %>
-            
+
             <% if (!string.IsNullOrEmpty(successMessage)) { %>
                 <div class="success"><%= successMessage %></div>
             <% } %>
-            
+
             <% if (!string.IsNullOrEmpty(errorMessage)) { %>
                 <div class="error"><%= errorMessage %></div>
             <% } %>

@@ -1,7 +1,7 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Register.aspx.cs" Inherits="LoanApplication.User.Register" %>
 <%@ Import Namespace="System.Configuration" %>
 <%@ Import Namespace="System.Data" %>
-<%@ Import Namespace="System.Data.SqlClient" %>
+<%@ Import Namespace="MySql.Data.MySqlClient" %>
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -66,7 +66,7 @@
                         <%
                             string errorMessage = "";
                             string successMessage = "";
-                            
+
                             if (IsPostBack)
                             {
                                 string fullName = Request.Form["txtFullName"];
@@ -76,10 +76,10 @@
                                 string address = Request.Form["txtAddress"];
                                 string occupation = Request.Form["txtOccupation"];
                                 string incomeStr = Request.Form["txtIncome"];
-                                
-                                if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(email) || 
-                                    string.IsNullOrEmpty(password) || string.IsNullOrEmpty(phone) || 
-                                    string.IsNullOrEmpty(address) || string.IsNullOrEmpty(occupation) || 
+
+                                if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(email) ||
+                                    string.IsNullOrEmpty(password) || string.IsNullOrEmpty(phone) ||
+                                    string.IsNullOrEmpty(address) || string.IsNullOrEmpty(occupation) ||
                                     string.IsNullOrEmpty(incomeStr))
                                 {
                                     errorMessage = "All fields are required!";
@@ -89,15 +89,18 @@
                                     try
                                     {
                                         decimal income = Convert.ToDecimal(incomeStr);
-                                        
-                                        // SSMS Connection string - SAME AS ADMIN
-                                        string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"].ConnectionString;
-                                        
-                                        using (SqlConnection con = new SqlConnection(connStr))
+
+                                        // Railway MySQL Connection string
+                                        string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
+                                        if (string.IsNullOrEmpty(connStr))
+                                            throw new Exception("Connection string 'LoanAppDB' not found in Web.config!");
+
+                                        using (MySqlConnection con = new MySqlConnection(connStr))
                                         {
-                                            string query = "INSERT INTO Users (FullName, Email, Password, Phone, Address, Occupation, MonthlyIncome) VALUES (@FullName, @Email, @Password, @Phone, @Address, @Occupation, @MonthlyIncome)";
-                                            
-                                            using (SqlCommand cmd = new SqlCommand(query, con))
+                                            string query = @"INSERT INTO Users (FullName, Email, Password, Phone, Address, Occupation, MonthlyIncome)
+                                                             VALUES (@FullName, @Email, @Password, @Phone, @Address, @Occupation, @MonthlyIncome)";
+
+                                            using (MySqlCommand cmd = new MySqlCommand(query, con))
                                             {
                                                 cmd.Parameters.AddWithValue("@FullName", fullName);
                                                 cmd.Parameters.AddWithValue("@Email", email);
@@ -106,11 +109,11 @@
                                                 cmd.Parameters.AddWithValue("@Address", address);
                                                 cmd.Parameters.AddWithValue("@Occupation", occupation);
                                                 cmd.Parameters.AddWithValue("@MonthlyIncome", income);
-                                                
+
                                                 con.Open();
                                                 int rowsAffected = cmd.ExecuteNonQuery();
                                                 con.Close();
-                                                
+
                                                 if (rowsAffected > 0)
                                                 {
                                                     successMessage = "Registration successful! Redirecting to login...";
@@ -123,7 +126,7 @@
                                             }
                                         }
                                     }
-                                    catch (SqlException sqlEx)
+                                    catch (MySqlException sqlEx)
                                     {
                                         errorMessage = "Database Error: " + sqlEx.Message;
                                     }
@@ -134,11 +137,11 @@
                                 }
                             }
                         %>
-                        
+
                         <% if (!string.IsNullOrEmpty(successMessage)) { %>
                             <div class="alert alert-success mt-3"><%= successMessage %></div>
                         <% } %>
-                        
+
                         <% if (!string.IsNullOrEmpty(errorMessage)) { %>
                             <div class="alert alert-danger mt-3"><%= errorMessage %></div>
                         <% } %>

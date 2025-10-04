@@ -1,8 +1,7 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Admin.aspx.cs" Inherits="LoanApplication.Admin.Admin" %>
 <%@ Import Namespace="System.Configuration" %>
-
 <%@ Import Namespace="System.Data" %>
-<%@ Import Namespace="System.Data.SqlClient" %>
+<%@ Import Namespace="MySql.Data.MySqlClient" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -10,10 +9,8 @@
     <title>Admin Login - Loan Application</title>
     <style>
         body { font-family: Arial; background: #f0f2f5; }
-        .login-box {
-            width: 350px; margin: 120px auto; padding: 30px;
-            background: #fff; border-radius: 10px; box-shadow: 0px 0px 8px #888;
-        }
+        .login-box { width: 350px; margin: 120px auto; padding: 30px;
+            background: #fff; border-radius: 10px; box-shadow: 0px 0px 8px #888;}
         .login-box h2 { text-align: center; margin-bottom: 20px; color: #444; }
         .form-control { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
         .btn-login { width: 100%; padding: 10px; background: #0078d7; color: white; border: none; border-radius: 5px; cursor: pointer; }
@@ -26,7 +23,7 @@
         <div class="login-box">
             <h2>Admin Login</h2>
 
-            <% 
+            <%
                 string errorMessage = "";
 
                 if (IsPostBack)
@@ -40,13 +37,13 @@
                     }
                     else
                     {
-                        // SSMS Connection string
-                        string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"].ConnectionString;
+                        // MySQL Connection string from Railway
+                        string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
 
-                        using (SqlConnection con = new SqlConnection(connStr))
+                        using (MySqlConnection con = new MySqlConnection(connStr))
                         {
                             string query = "SELECT COUNT(*) FROM Admin WHERE Username=@uname AND Password=@pwd";
-                            using (SqlCommand cmd = new SqlCommand(query, con))
+                            using (MySqlCommand cmd = new MySqlCommand(query, con))
                             {
                                 cmd.Parameters.AddWithValue("@uname", username);
                                 cmd.Parameters.AddWithValue("@pwd", password);
@@ -69,7 +66,6 @@
                     }
                 }
             %>
-
 
             <input type="text" name="txtUsername" placeholder="Enter Username" class="form-control" />
             <input type="password" name="txtPassword" placeholder="Enter Password" class="form-control" />
