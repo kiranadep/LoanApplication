@@ -1,4 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Register.aspx.cs" Inherits="LoanApplication.User.Register" %>
+<%@ Import Namespace="System.Configuration" %>
+<%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
 <!DOCTYPE html>
 
@@ -18,86 +20,128 @@
                         <h4 class="mb-0">Register - Loan Application</h4>
                     </div>
                     <div class="card-body">
-                        <!-- Form posting to the same page -->
-                        <form method="post">
+                        <form id="form1" runat="server">
                             <div class="mb-3">
                                 <label class="form-label">Full Name</label>
-                                <input type="text" name="t1" class="form-control" required />
+                                <input type="text" name="txtFullName" class="form-control" required />
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" name="t2" class="form-control" required />
+                                <input type="email" name="txtEmail" class="form-control" required />
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Password</label>
-                                <input type="password" name="t3" class="form-control" required />
+                                <input type="password" name="txtPassword" class="form-control" required />
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Phone Number</label>
-                                <input type="text" name="t4" class="form-control" required />
+                                <input type="text" name="txtPhone" class="form-control" required />
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Address</label>
-                                <textarea name="t5" class="form-control" required></textarea>
+                                <textarea name="txtAddress" class="form-control" rows="3" required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Occupation</label>
-                                <input type="text" name="t6" class="form-control" required />
+                                <select name="txtOccupation" class="form-control" required>
+                                    <option value="">-- Select Occupation --</option>
+                                    <option value="Student">Student</option>
+                                    <option value="Software Developer">Software Developer</option>
+                                    <option value="Teacher">Teacher</option>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Business Owner">Business Owner</option>
+                                    <option value="Housewife">Housewife</option>
+                                    <option value="Freelancer">Freelancer</option>
+                                    <option value="Other">Other</option>
+                                </select>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Monthly Income</label>
-                                <input type="number" step="0.01" name="t7" class="form-control" required />
+                                <input type="number" step="0.01" name="txtIncome" class="form-control" required />
                             </div>
                             <button type="submit" class="btn btn-success w-100">Register</button>
                             <p class="text-center mt-3">Already have an account? <a href="Login.aspx">Login here</a></p>
                         </form>
 
                         <%
-                                        if (IsPostBack)
-                                        {
-                                            try
-                                            {
-                                                // Get form values
-                                                string t1 = Request.Form["t1"];
-                                                string t2 = Request.Form["t2"];
-                                                string t3 = Request.Form["t3"];
-                                                string t4 = Request.Form["t4"];
-                                                string t5 = Request.Form["t5"];
-                                                string t6 = Request.Form["t6"];
-                                                decimal t7 = Convert.ToDecimal(Request.Form["t7"]);
-
-                                                // Connection string
-                                                string path = @"Data Source=LAPTOP-8665JUUD\SQLEXPRESS;Initial Catalog=LoanDB1;Integrated Security=True";
-
-                                                SqlConnection con = new SqlConnection(path);
-
-                                                string query = "INSERT INTO UserN (FullName, Email, Password, Phone, Address, Occupation, MonthlyIncome) VALUES (@FullName, @Email, @Password, @Phone, @Address, @Occupation, @MonthlyIncome)";
-
-                                                SqlCommand cmd = new SqlCommand(query, con);
-
-                                                cmd.Parameters.AddWithValue("@FullName", t1);
-                                                cmd.Parameters.AddWithValue("@Email", t2);
-                                                cmd.Parameters.AddWithValue("@Password", t3);
-                                                cmd.Parameters.AddWithValue("@Phone", t4);
-                                                cmd.Parameters.AddWithValue("@Address", t5);
-                                                cmd.Parameters.AddWithValue("@Occupation", t6);
-                                                cmd.Parameters.AddWithValue("@MonthlyIncome", t7);
-
-                                                con.Open();
-                                                cmd.ExecuteNonQuery();
-                                            
-                                    
-
-                                        // Redirect to Login.aspx after successful registration
-                                        Response.Redirect("Login.aspx");
-                                    }
-                                catch (Exception ex)
+                            string errorMessage = "";
+                            string successMessage = "";
+                            
+                            if (IsPostBack)
+                            {
+                                string fullName = Request.Form["txtFullName"];
+                                string email = Request.Form["txtEmail"];
+                                string password = Request.Form["txtPassword"];
+                                string phone = Request.Form["txtPhone"];
+                                string address = Request.Form["txtAddress"];
+                                string occupation = Request.Form["txtOccupation"];
+                                string incomeStr = Request.Form["txtIncome"];
+                                
+                                if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(email) || 
+                                    string.IsNullOrEmpty(password) || string.IsNullOrEmpty(phone) || 
+                                    string.IsNullOrEmpty(address) || string.IsNullOrEmpty(occupation) || 
+                                    string.IsNullOrEmpty(incomeStr))
                                 {
-                                    // Show any error for debugging
-                                    Response.Write("<div class='alert alert-danger mt-3'>Error: " + ex.Message + "</div>");
+                                    errorMessage = "All fields are required!";
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        decimal income = Convert.ToDecimal(incomeStr);
+                                        
+                                        // SSMS Connection string - SAME AS ADMIN
+                                        string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"].ConnectionString;
+                                        
+                                        using (SqlConnection con = new SqlConnection(connStr))
+                                        {
+                                            string query = "INSERT INTO Users (FullName, Email, Password, Phone, Address, Occupation, MonthlyIncome) VALUES (@FullName, @Email, @Password, @Phone, @Address, @Occupation, @MonthlyIncome)";
+                                            
+                                            using (SqlCommand cmd = new SqlCommand(query, con))
+                                            {
+                                                cmd.Parameters.AddWithValue("@FullName", fullName);
+                                                cmd.Parameters.AddWithValue("@Email", email);
+                                                cmd.Parameters.AddWithValue("@Password", password);
+                                                cmd.Parameters.AddWithValue("@Phone", phone);
+                                                cmd.Parameters.AddWithValue("@Address", address);
+                                                cmd.Parameters.AddWithValue("@Occupation", occupation);
+                                                cmd.Parameters.AddWithValue("@MonthlyIncome", income);
+                                                
+                                                con.Open();
+                                                int rowsAffected = cmd.ExecuteNonQuery();
+                                                con.Close();
+                                                
+                                                if (rowsAffected > 0)
+                                                {
+                                                    successMessage = "Registration successful! Redirecting to login...";
+                                                    Response.Write("<script>setTimeout(function(){ window.location.href = 'Login.aspx'; }, 2000);</script>");
+                                                }
+                                                else
+                                                {
+                                                    errorMessage = "Registration failed. Please try again.";
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch (SqlException sqlEx)
+                                    {
+                                        errorMessage = "Database Error: " + sqlEx.Message;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        errorMessage = "Error: " + ex.Message;
+                                    }
                                 }
                             }
                         %>
+                        
+                        <% if (!string.IsNullOrEmpty(successMessage)) { %>
+                            <div class="alert alert-success mt-3"><%= successMessage %></div>
+                        <% } %>
+                        
+                        <% if (!string.IsNullOrEmpty(errorMessage)) { %>
+                            <div class="alert alert-danger mt-3"><%= errorMessage %></div>
+                        <% } %>
                     </div>
                 </div>
             </div>

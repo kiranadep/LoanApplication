@@ -33,8 +33,15 @@
         .auth-buttons {
             display: flex;
             gap: 15px;
+            align-items: center;
         }
-        .btn-login, .btn-signup {
+        .user-welcome {
+            font-size: 14px;
+            color: #1e3c72;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .btn-login, .btn-signup, .btn-logout {
             padding: 10px 25px;
             border: none;
             border-radius: 8px;
@@ -59,6 +66,14 @@
         .btn-signup:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
+        }
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-logout:hover {
+            background: #c82333;
+            transform: translateY(-2px);
         }
 
         /* Hero Section */
@@ -251,15 +266,43 @@
     </style>
 </head>
 <body>
-    <form  id="form1" runat="server">
-        <!-- Header with Login/Signup -->
+    <form id="form1" runat="server">
+        <!-- Header with Login/Signup or Logout -->
         <div class="header">
             <div class="logo">💰 LoanHub</div>
             <div class="auth-buttons">
-                <button type="button" class="btn-login" onclick="window.location.href='../user/login.aspx'">Login</button>
-                <button type="button" class="btn-signup" onclick="window.location.href='../user/Register.aspx'">Register</button>
+                <% 
+                    // Check if user is logged in
+                    bool isLoggedIn = Session["UserID"] != null;
+                    string userName = Session["UserName"] != null ? Session["UserName"].ToString() : "";
+                    
+                    if (isLoggedIn) 
+                    { 
+                %>
+                    <span class="user-welcome">Welcome, <%= userName %>!</span>
+                    <button type="submit" name="btnLogout" class="btn-logout">Logout</button>
+                <% 
+                    } 
+                    else 
+                    { 
+                %>
+                    <button type="button" class="btn-login" onclick="window.location.href='../user/login.aspx'">Login</button>
+                    <button type="button" class="btn-signup" onclick="window.location.href='../user/Register.aspx'">Register</button>
+                <% 
+                    } 
+                %>
             </div>
         </div>
+
+        <%
+            // Handle logout
+            if (IsPostBack && Request.Form["btnLogout"] != null)
+            {
+                Session.Clear();
+                Session.Abandon();
+                Response.Redirect("userview.aspx");
+            }
+        %>
 
         <!-- Hero Section -->
         <div class="hero">
@@ -561,12 +604,18 @@
         }
 
         function applyLoan(loanType) {
-            // Redirect to apply loan page with loan type
-            window.location.href = 'Loan.aspx?loanType=' + encodeURIComponent(loanType);
+            <% if (Session["UserID"] != null) { %>
+                // User is logged in, redirect to loan application
+                window.location.href = 'Loan.aspx?loanType=' + encodeURIComponent(loanType);
+            <% } else { %>
+                // User not logged in, redirect to login page
+                alert('Please login to apply for a loan');
+                window.location.href = '../user/login.aspx';
+            <% } %>
         }
 
         // Close modal when clicking outside
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
                 document.body.style.overflow = 'auto';
@@ -574,7 +623,7 @@
         }
 
         // Close modal on Escape key
-        document.addEventListener('keydown', function(event) {
+        document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 var modals = document.getElementsByClassName('modal');
                 for (var i = 0; i < modals.length; i++) {

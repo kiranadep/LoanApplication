@@ -151,7 +151,7 @@
             string monthlyIncome = Request.Form["monthlyIncome"];
             
             // Create database connection
-            string connString = "Data Source=LAPTOP-8665JUUD\\SQLEXPRESS;Initial Catalog=LoanDB1;Integrated Security=True";
+            string connString = "Data Source=DESKTOP-0BE9U1U\\SQLEXPRESS;Initial Catalog=LoanApplicationDB;Integrated Security=True";
             SqlConnection conn = new SqlConnection(connString);
             
             try
@@ -227,7 +227,7 @@
             <p>• Processing time: 2-3 business days</p>
         </div>
 
-        <form method="post" action="">
+        <form method="post" >
             <div class="form-row">
                 <div class="form-group">
                     <label>Full Name <span class="required">*</span></label>

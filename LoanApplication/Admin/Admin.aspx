@@ -1,5 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Admin.aspx.cs" Inherits="LoanApplication.Admin.Admin" %>
-
+<%@ Import Namespace="System.Configuration" %>
 
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
@@ -41,7 +41,7 @@
                     else
                     {
                         // SSMS Connection string
-                        string connStr = @"Data Source=DESKTOP-0BE9U1U\SQLEXPRESS;Initial Catalog=AdminControl;Integrated Security=True;";
+                        string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"].ConnectionString;
 
                         using (SqlConnection con = new SqlConnection(connStr))
                         {

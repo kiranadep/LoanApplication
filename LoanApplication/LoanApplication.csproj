@@ -77,7 +77,6 @@
     <Content Include="Loans\userview.aspx" />
     <Content Include="User\login.aspx" />
     <Content Include="User\Register.aspx" />
-    <Content Include="User\registersql.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -147,13 +146,6 @@
     </Compile>
     <Compile Include="User\Register.aspx.designer.cs">
       <DependentUpon>Register.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="User\registersql.aspx.cs">
-      <DependentUpon>registersql.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="User\registersql.aspx.designer.cs">
-      <DependentUpon>registersql.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
