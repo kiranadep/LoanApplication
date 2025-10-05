@@ -31,69 +31,70 @@
         <h1>Loan Application</h1>
 
         <%
-        string alertMessage = "";
-        string alertType = "";
+            string alertMessage = "";
+            string alertType = "";
 
-        if (Request.HttpMethod == "POST")
-        {
-            string fullName = Request.Form["fullName"];
-            string email = Request.Form["email"];
-            string phone = Request.Form["phone"];
-            string address = Request.Form["address"];
-            string loanType = Request.Form["loanType"];
-            decimal loanAmount = Convert.ToDecimal(Request.Form["loanAmount"]);
-            string employmentType = Request.Form["employmentType"];
-            decimal monthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
-
-            // ✅ Use your MySQL connection string from Railway
-            string connString = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
-
-            using (MySqlConnection conn = new MySqlConnection(connString))
+            if (Request.HttpMethod == "POST")
             {
-                try
+                string fullName = Request.Form["fullName"];
+                string email = Request.Form["email"];
+                string phone = Request.Form["phone"];
+                string address = Request.Form["address"];
+                string loanType = Request.Form["loanType"];
+                decimal loanAmount = Convert.ToDecimal(Request.Form["loanAmount"]);
+                string employmentType = Request.Form["employmentType"];
+                decimal monthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
+
+                // ✅ Use your MySQL connection string from Railway
+                string connString = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
+
+                using (MySqlConnection conn = new MySqlConnection(connString))
                 {
-                    conn.Open();
-                    string query = @"INSERT INTO LoanApplications 
+                    try
+                    {
+                        conn.Open();
+                        string query = @"INSERT INTO LoanApplications 
                                     (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, Status)
                                     VALUES
                                     (@FullName,@Email,@Phone,@Address,@LoanType,@LoanAmount,@EmploymentType,@MonthlyIncome,'Pending')";
-                    
-                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@FullName", fullName);
-                        cmd.Parameters.AddWithValue("@Email", email);
-                        cmd.Parameters.AddWithValue("@Phone", phone);
-                        cmd.Parameters.AddWithValue("@Address", address);
-                        cmd.Parameters.AddWithValue("@LoanType", loanType);
-                        cmd.Parameters.AddWithValue("@LoanAmount", loanAmount);
-                        cmd.Parameters.AddWithValue("@EmploymentType", employmentType);
-                        cmd.Parameters.AddWithValue("@MonthlyIncome", monthlyIncome);
 
-                        int rows = cmd.ExecuteNonQuery();
-                        if (rows > 0)
+                        using (MySqlCommand cmd = new MySqlCommand(query, conn))
                         {
-                            alertMessage = "✓ Application submitted successfully!";
-                            alertType = "success";
-                        }
-                        else
-                        {
-                            alertMessage = "✗ Failed to submit application.";
-                            alertType = "error";
+                            cmd.Parameters.AddWithValue("@FullName", fullName);
+                            cmd.Parameters.AddWithValue("@Email", email);
+                            cmd.Parameters.AddWithValue("@Phone", phone);
+                            cmd.Parameters.AddWithValue("@Address", address);
+                            cmd.Parameters.AddWithValue("@LoanType", loanType);
+                            cmd.Parameters.AddWithValue("@LoanAmount", loanAmount);
+                            cmd.Parameters.AddWithValue("@EmploymentType", employmentType);
+                            cmd.Parameters.AddWithValue("@MonthlyIncome", monthlyIncome);
+
+                            int rows = cmd.ExecuteNonQuery();
+                            if (rows > 0)
+                            {
+                                alertMessage = "✓ Application submitted successfully!";
+                                alertType = "success";
+                            }
+                            else
+                            {
+                                alertMessage = "✗ Failed to submit application.";
+                                alertType = "error";
+                            }
+                            Response.Redirect("userview.aspx");
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    alertMessage = "✗ Error: " + ex.Message;
-                    alertType = "error";
+                    catch (Exception ex)
+                    {
+                        alertMessage = "✗ Error: " + ex.Message;
+                        alertType = "error";
+                    }
                 }
             }
-        }
 
-        if (!string.IsNullOrEmpty(alertMessage))
-        {
-            Response.Write("<div class='alert alert-" + alertType + "'>" + alertMessage + "</div>");
-        }
+            if (!string.IsNullOrEmpty(alertMessage))
+            {
+                Response.Write("<div class='alert alert-" + alertType + "'>" + alertMessage + "</div>");
+            }
         %>
 
         <form method="post">
