@@ -94,7 +94,7 @@
     <!-- ===== Main Content ===== -->
     <div class="main-content">
         <div class="header">
-            <h1>Loan Applications Dashboard</h1>
+            <h1>Loan Applications</h1>
             <p class="subtitle">View and manage all loan applications</p>
         </div>
 

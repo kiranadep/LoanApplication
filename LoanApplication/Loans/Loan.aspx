@@ -1,13 +1,12 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Loan.aspx.cs" Inherits="LoanApplication.Loans.Loan" %>
 <%@ Import Namespace="System.Data" %>
-<%@ Import Namespace="System.Data.SqlClient" %>
+<%@ Import Namespace="MySql.Data.MySqlClient" %> <!-- ✅ Use MySQL namespace -->
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Apply for Loan</title>
     <style>
-        /* Styles same as your previous form */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg,#1e3c72 0%,#2a5298 50%,#7e22ce 100%); min-height: 100vh; padding: 40px 20px; }
         .container { max-width: 700px; margin:0 auto; background:white; padding:40px; border-radius:15px; box-shadow:0 20px 60px rgba(0,0,0,0.3);}
@@ -34,6 +33,7 @@
         <%
         string alertMessage = "";
         string alertType = "";
+
         if (Request.HttpMethod == "POST")
         {
             string fullName = Request.Form["fullName"];
@@ -45,8 +45,10 @@
             string employmentType = Request.Form["employmentType"];
             decimal monthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
 
-            string connString = "Data Source=DESKTOP-0BE9U1U\\SQLEXPRESS;Initial Catalog=LoanApplicationDB;Integrated Security=True";
-            using(SqlConnection conn = new SqlConnection(connString))
+            // ✅ Use your MySQL connection string from Railway
+            string connString = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
+
+            using (MySqlConnection conn = new MySqlConnection(connString))
             {
                 try
                 {
@@ -55,7 +57,8 @@
                                     (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, Status)
                                     VALUES
                                     (@FullName,@Email,@Phone,@Address,@LoanType,@LoanAmount,@EmploymentType,@MonthlyIncome,'Pending')";
-                    using(SqlCommand cmd = new SqlCommand(query, conn))
+                    
+                    using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@FullName", fullName);
                         cmd.Parameters.AddWithValue("@Email", email);
@@ -67,15 +70,27 @@
                         cmd.Parameters.AddWithValue("@MonthlyIncome", monthlyIncome);
 
                         int rows = cmd.ExecuteNonQuery();
-                        if(rows>0){ alertMessage="✓ Application submitted successfully!"; alertType="success"; }
-                        else{ alertMessage="✗ Failed to submit application."; alertType="error"; }
+                        if (rows > 0)
+                        {
+                            alertMessage = "✓ Application submitted successfully!";
+                            alertType = "success";
+                        }
+                        else
+                        {
+                            alertMessage = "✗ Failed to submit application.";
+                            alertType = "error";
+                        }
                     }
                 }
-                catch(Exception ex){ alertMessage="✗ Error: "+ex.Message; alertType="error"; }
+                catch (Exception ex)
+                {
+                    alertMessage = "✗ Error: " + ex.Message;
+                    alertType = "error";
+                }
             }
         }
 
-        if(!string.IsNullOrEmpty(alertMessage))
+        if (!string.IsNullOrEmpty(alertMessage))
         {
             Response.Write("<div class='alert alert-" + alertType + "'>" + alertMessage + "</div>");
         }
@@ -105,15 +120,15 @@
                 <div class="form-group"><label>Loan Amount (₹) <span class="required">*</span></label><input type="number" name="loanAmount" min="10000" step="1000" required /></div>
                 <div class="form-group"><label>Employment Type <span class="required">*</span></label>
                     <select name="employmentType" required>
-                                    <option value="">-- Select Occupation --</option>
-                                    <option value="Student">Student</option>
-                                    <option value="Software Developer">Software Developer</option>
-                                    <option value="Teacher">Teacher</option>
-                                    <option value="Doctor">Doctor</option>
-                                    <option value="Business Owner">Business Owner</option>
-                                    <option value="Housewife">Housewife</option>
-                                    <option value="Freelancer">Freelancer</option>
-                                    <option value="Other">Other</option>
+                        <option value="">-- Select Occupation --</option>
+                        <option value="Student">Student</option>
+                        <option value="Software Developer">Software Developer</option>
+                        <option value="Teacher">Teacher</option>
+                        <option value="Doctor">Doctor</option>
+                        <option value="Business Owner">Business Owner</option>
+                        <option value="Housewife">Housewife</option>
+                        <option value="Freelancer">Freelancer</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
             </div>
