@@ -121,6 +121,10 @@
     <Content Include="Admin\Admin.aspx" />
     <Content Include="Admin\AdminDashboard.aspx" />
     <Content Include="Admin\Logout.aspx" />
+    <Content Include="Admin\Restore.aspx" />
+    <Content Include="Admin\Settings.aspx" />
+    <Content Include="Admin\Trash.aspx" />
+    <Content Include="Admin\Users.aspx" />
     <Content Include="Contents\css\AdminPanel.css" />
     <Content Include="Global.asax" />
     <Content Include="LoanHistry\LoanHistory.aspx" />
@@ -153,6 +157,34 @@
     </Compile>
     <Compile Include="Admin\Logout.aspx.designer.cs">
       <DependentUpon>Logout.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Restore.aspx.cs">
+      <DependentUpon>Restore.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Restore.aspx.designer.cs">
+      <DependentUpon>Restore.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Settings.aspx.cs">
+      <DependentUpon>Settings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Settings.aspx.designer.cs">
+      <DependentUpon>Settings.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Trash.aspx.cs">
+      <DependentUpon>Trash.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Trash.aspx.designer.cs">
+      <DependentUpon>Trash.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Users.aspx.cs">
+      <DependentUpon>Users.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Users.aspx.designer.cs">
+      <DependentUpon>Users.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
