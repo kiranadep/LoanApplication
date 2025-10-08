@@ -7,67 +7,33 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Apply for Loan</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg,#1e3c72 0%,#2a5298 50%,#7e22ce 100%);
-            min-height: 100vh; 
-            padding: 40px 20px; 
+            min-height: 100vh;
+            padding: 40px 20px;
         }
-        .container { 
-            max-width: 700px; 
-            margin:0 auto; 
-            background:white; 
-            padding:40px; 
-            border-radius:15px; 
-            box-shadow:0 20px 60px rgba(0,0,0,0.3); 
+        .container-custom {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        h1 { color:#1e3c72; margin-bottom:10px; font-size:32px; text-align:center; }
-        .form-row { display:flex; gap:20px; margin-bottom:20px; }
-        .form-group { flex:1; margin-bottom:20px; }
-        label { display:block; margin-bottom:8px; color:#333; font-weight:600; font-size:14px; }
-        input,select,textarea { 
-            width:100%; padding:12px 15px; border:2px solid #e0e0e0;
-            border-radius:8px; font-size:15px; transition: all 0.3s; font-family:inherit; 
+        .alert-custom {
+            margin-bottom: 20px;
         }
-        input:focus, select:focus, textarea:focus { 
-            outline:none; border-color:#2a5298; box-shadow:0 0 0 3px rgba(42,82,152,0.1); 
-        }
-        textarea { resize:vertical; min-height:100px; }
-        .required { color:#e74c3c; }
-        .btn-submit { 
-            background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); 
-            color:white; padding:15px 40px; border:none; border-radius:8px; 
-            cursor:pointer; font-size:16px; font-weight:bold; width:100%; 
-            transition:all 0.3s; margin-top:10px; 
-        }
-            .btn-submit:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 25px rgba(30,60,114,0.3);
-            }
-        .btn-green{ 
-            background:#256029; 
-            color:white; padding:15px 40px; border:none; border-radius:8px; 
-            cursor:pointer; font-size:16px; font-weight:bold; width:100%; 
-            transition:all 0.3s; margin-top:10px; 
-        }
-        .btn-green:hover { 
-            transform:translateY(-2px); 
-            box-shadow:0 10px 25px rgba(30,60,114,0.3); 
-        }
-        .alert { 
-            padding:15px 20px; margin-bottom:25px; border-radius:8px; 
-            text-align:center; font-weight:500; animation: slideDown 0.3s ease; 
-        }
-        .alert.success { background:#e6ffed; color:#256029; border:1px solid #b7e4c7; }
-        .alert.error { background:#fdecea; color:#a71d2a; border:1px solid #f5c6cb; }
-        .buttons { display:flex; gap:15px; justify-content:center; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Loan Application</h1>
+    <div class="container container-custom">
+        <h1 class="text-center text-primary mb-4">Loan Application</h1>
 
         <%
             string alert = "";
@@ -79,20 +45,7 @@
 
             if (Request.HttpMethod == "POST")
             {
-<<<<<<< HEAD
                 string action = Request.Form["action"];
-=======
-                string fullName = Request.Form["fullName"];
-                string email = Request.Form["email"];
-                string phone = Request.Form["phone"];
-                string address = Request.Form["address"];
-                string loanType = Request.Form["loanType"];
-                decimal loanAmount = Convert.ToDecimal(Request.Form["loanAmount"]);
-                string employmentType = Request.Form["employmentType"];
-                decimal monthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
-                HttpPostedFile documentFile = Request.Files["document"];
-
->>>>>>> 4aad3f1f8e611cc13e34872704cb8c8df6fa8440
 
                 if (action == "calculate")
                 {
@@ -135,7 +88,6 @@
                 {
                     try
                     {
-<<<<<<< HEAD
                         string fullName = Request.Form["fullName"];
                         string email = Request.Form["email"];
                         string phone = Request.Form["phone"];
@@ -144,28 +96,25 @@
                         decimal loanAmount = Convert.ToDecimal(Request.Form["loanAmount"]);
                         string employmentType = Request.Form["employmentType"];
                         decimal monthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
-=======
-                        conn.Open();
-                        string query = @"INSERT INTO LoanApplications 
-                                    (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, Status,documentFile,TotalAmount)
-                                    VALUES
-                                    (@FullName,@Email,@Phone,@Address,@LoanType,@LoanAmount,@EmploymentType,@MonthlyIncome,'Pending',@documentFile,@TotalAmount)";
->>>>>>> 4aad3f1f8e611cc13e34872704cb8c8df6fa8440
+                        HttpPostedFile documentFile = Request.Files["document"];
 
                         if (ViewState["TotalAmount"] != null)
                             TotalAmount = Convert.ToDecimal(ViewState["TotalAmount"]);
-                        if (ViewState["InterestRate"] != null)
-                            interestRate = Convert.ToDecimal(ViewState["InterestRate"]);
-                        if (ViewState["Months"] != null)
-                            months = Convert.ToInt32(ViewState["Months"]);
+
+                        byte[] documentBytes = null;
+                        if (documentFile != null && documentFile.ContentLength > 0)
+                        {
+                            documentBytes = new byte[documentFile.ContentLength];
+                            documentFile.InputStream.Read(documentBytes, 0, documentFile.ContentLength);
+                        }
 
                         using (MySqlConnection conn = new MySqlConnection(connStr))
                         {
                             conn.Open();
                             string query = @"INSERT INTO LoanApplications 
-                            (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, TotalAmount, Status, AppliedAt, Document)
-                            VALUES
-                            (@FullName, @Email, @Phone, @Address, @LoanType, @LoanAmount, @EmploymentType, @MonthlyIncome, @TotalAmount, 'Pending', NOW(), @Document)";
+                                (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, TotalAmount, Status, AppliedAt, Document)
+                                VALUES
+                                (@FullName, @Email, @Phone, @Address, @LoanType, @LoanAmount, @EmploymentType, @MonthlyIncome, @TotalAmount, 'Pending', NOW(), @Document)";
 
                             MySqlCommand cmd = new MySqlCommand(query, conn);
                             cmd.Parameters.AddWithValue("@FullName", fullName);
@@ -176,52 +125,47 @@
                             cmd.Parameters.AddWithValue("@LoanAmount", loanAmount);
                             cmd.Parameters.AddWithValue("@EmploymentType", employmentType);
                             cmd.Parameters.AddWithValue("@MonthlyIncome", monthlyIncome);
-<<<<<<< HEAD
                             cmd.Parameters.AddWithValue("@TotalAmount", TotalAmount);
-                            //cmd.Parameters.AddWithValue("@Document", documentBytes); // if you are uploading a file
-=======
-                            cmd.Parameters.AddWithValue("@documentFile", documentFile);
->>>>>>> 4aad3f1f8e611cc13e34872704cb8c8df6fa8440
+                            cmd.Parameters.AddWithValue("@Document", documentBytes);
 
                             cmd.ExecuteNonQuery();
                         }
 
-                        alert = "<div class='alert success'>✓ Application submitted successfully!</div>";
+                        alert = "<div class='alert alert-success alert-custom'>✓ Application submitted successfully!</div>";
                     }
                     catch (Exception ex)
                     {
-                        alert = "<div class='alert error'>✗ Error: " + ex.Message + "</div>";
+                        alert = "<div class='alert alert-danger alert-custom'>✗ Error: " + ex.Message + "</div>";
                     }
                 }
             }
 
             Response.Write(alert);
             if (!string.IsNullOrEmpty(payableMessage))
-                Response.Write("<div class='alert success'>" + payableMessage + "</div>");
+                Response.Write("<div class='alert alert-success alert-custom'>" + payableMessage + "</div>");
         %>
 
-        <form method="post">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Full Name <span class="required">*</span></label>
-                    <input type="text" name="fullName" value="<%= Request.Form["fullName"] %>" required /> 
-                    <!--Request.Form["fullName"] means:
-                “get the value that the user typed in this box before refresh.”-->
+        <!-- Main Form -->
+        <form method="post" enctype="multipart/form-data">
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="fullName" value="<%= Request.Form["fullName"] %>" required />
                 </div>
-                <div class="form-group">
-                    <label>Email <span class="required">*</span></label>
-                    <input type="email" name="email" value="<%= Request.Form["email"] %>" required />
+                <div class="col">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" name="email" value="<%= Request.Form["email"] %>" required />
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Phone <span class="required">*</span></label>
-                    <input type="tel" name="phone" pattern="[0-9]{10}" value="<%= Request.Form["phone"] %>" required />
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Phone <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" name="phone" pattern="[0-9]{10}" value="<%= Request.Form["phone"] %>" required />
                 </div>
-                <div class="form-group">
-                    <label>Loan Type <span class="required">*</span></label>
-                    <select name="loanType" required>
+                <div class="col">
+                    <label class="form-label">Loan Type <span class="text-danger">*</span></label>
+                    <select class="form-select" name="loanType" required>
                         <option value="">--Select--</option>
                         <option value="Personal Loan" <%= Request.Form["loanType"] == "Personal Loan" ? "selected" : "" %>>Personal Loan</option>
                         <option value="Home Loan" <%= Request.Form["loanType"] == "Home Loan" ? "selected" : "" %>>Home Loan</option>
@@ -233,19 +177,19 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Address <span class="required">*</span></label>
-                <input type="text" name="address" value="<%= Request.Form["address"] %>" required />
+            <div class="mb-3">
+                <label class="form-label">Address <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="address" value="<%= Request.Form["address"] %>" required />
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Loan Amount (₹) <span class="required">*</span></label>
-                    <input type="number" name="loanAmount" min="10000" step="1000" value="<%= Request.Form["loanAmount"] %>" required />
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Loan Amount (₹) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" name="loanAmount" min="10000" step="1000" value="<%= Request.Form["loanAmount"] %>" required />
                 </div>
-                <div class="form-group">
-                    <label>Employment Type <span class="required">*</span></label>
-                    <select name="employmentType" required>
+                <div class="col">
+                    <label class="form-label">Employment Type <span class="text-danger">*</span></label>
+                    <select class="form-select" name="employmentType" required>
                         <option value="">-- Select Occupation --</option>
                         <option value="Student" <%= Request.Form["employmentType"] == "Student" ? "selected" : "" %>>Student</option>
                         <option value="Software Developer" <%= Request.Form["employmentType"] == "Software Developer" ? "selected" : "" %>>Software Developer</option>
@@ -258,45 +202,32 @@
                     </select>
                 </div>
             </div>
-<<<<<<< HEAD
 
-            <div class="form-group">
-                <label>Monthly Income (₹) <span class="required">*</span></label>
-                <input type="number" name="monthlyIncome" min="10000" step="1000" value="<%= Request.Form["monthlyIncome"] %>" required />
+            <div class="mb-3">
+                <label class="form-label">Monthly Income (₹) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" name="monthlyIncome" min="10000" step="1000" value="<%= Request.Form["monthlyIncome"] %>" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Upload Document (PDF/Image) <span class="text-danger">*</span></label>
+                <input type="file" class="form-control" name="document" accept=".pdf,.jpg,.jpeg,.png" required />
             </div>
 
             <input type="hidden" name="months" value="12" />
 
-
-            <div class="form-row">
-                <div class="form-group" style="flex:2;">
-                    <label>Total Payable Amount</label>
-                    <input type="text" name="totalAmount" value="<%= payableMessage %>" readonly />
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Total Payable Amount</label>
+                    <input type="text" class="form-control" name="totalAmount" value="<%= payableMessage %>" readonly />
                 </div>
-                <div class="form-group" style="flex:1; display:flex; align-items:flex-end;">
-                    <button type="submit" name="action" value="calculate" class="btn-green">Calculate</button>
-
+                <div class="col d-flex align-items-end">
+                    <button type="submit" name="action" value="calculate" class="btn btn-success flex-fill">Calculate</button>
                 </div>
             </div>
 
-            <div class="buttons">
-               
-                <button type="submit" name="action" value="submit" class="btn-submit">Submit Application</button>
+            <div class="d-flex gap-2">
+                <button type="submit" name="action" value="submit" class="btn btn-primary flex-fill">Submit Application</button>
             </div>
-=======
-            <div class="form-group"><label>Monthly Income (₹) <span class="required">*</span></label><input type="number" name="monthlyIncome" min="10000" step="1000" required /></div>
-            <form method="post" enctype="multipart/form-data">
-    
-    <div class="form-group">
-        <label>Upload Document (PDF/Image) <span class="required">*</span></label>
-        <input type="file" name="document" accept=".pdf,.jpg,.jpeg,.png" required />
-    </div>
-    
-</form>
-
-            <button type="submit" class="btn-submit">Submit Application</button>
-
->>>>>>> 4aad3f1f8e611cc13e34872704cb8c8df6fa8440
         </form>
     </div>
 </body>
