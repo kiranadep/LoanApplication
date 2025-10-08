@@ -11,7 +11,9 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #e91e63, #f8f9fa);
+            
+/*            background: linear-gradient(to right, #e91e63, #f8f9fa);*/
+            background-color:lightblue;
             height: 100vh;
             display: flex;
             justify-content: center;

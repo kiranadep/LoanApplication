@@ -7,7 +7,7 @@
     {
         Response.Redirect("Admin.aspx");
     }
-else
+    else
 
 %>
 <!DOCTYPE html>
@@ -76,7 +76,7 @@ else
 
         <%
                 // ===== Server-side POST handling =====
-                string alertMessage = "";
+            string alertMessage = "";
             string alertType = "";
             string connString = System.Configuration.ConfigurationManager.ConnectionStrings["LoanAppDB"].ConnectionString;
 

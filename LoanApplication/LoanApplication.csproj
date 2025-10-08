@@ -127,9 +127,6 @@
     <Content Include="Admin\Users.aspx" />
     <Content Include="Contents\css\AdminPanel.css" />
     <Content Include="Global.asax" />
-    <Content Include="LoanHistry\LoanHistory.aspx" />
-    <Content Include="LoanHistry\use.aspx" />
-    <Content Include="LoanHistry\userlogindb.aspx" />
     <Content Include="Loans\Loan.aspx" />
     <Content Include="Loans\userview.aspx" />
     <Content Include="User\login.aspx" />
@@ -188,27 +185,6 @@
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="LoanHistry\LoanHistory.aspx.cs">
-      <DependentUpon>LoanHistory.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LoanHistry\LoanHistory.aspx.designer.cs">
-      <DependentUpon>LoanHistory.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LoanHistry\use.aspx.cs">
-      <DependentUpon>use.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LoanHistry\use.aspx.designer.cs">
-      <DependentUpon>use.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LoanHistry\userlogindb.aspx.cs">
-      <DependentUpon>userlogindb.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="LoanHistry\userlogindb.aspx.designer.cs">
-      <DependentUpon>userlogindb.aspx</DependentUpon>
     </Compile>
     <Compile Include="Loans\Loan.aspx.cs">
       <DependentUpon>Loan.aspx</DependentUpon>
