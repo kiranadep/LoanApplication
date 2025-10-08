@@ -44,6 +44,8 @@
                 decimal loanAmount = Convert.ToDecimal(Request.Form["loanAmount"]);
                 string employmentType = Request.Form["employmentType"];
                 decimal monthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
+                HttpPostedFile documentFile = Request.Files["document"];
+
 
                 // ✅ Use your MySQL connection string from Railway
                 string connString = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
@@ -54,9 +56,9 @@
                     {
                         conn.Open();
                         string query = @"INSERT INTO LoanApplications 
-                                    (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, Status)
+                                    (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, Status,documentFile,TotalAmount)
                                     VALUES
-                                    (@FullName,@Email,@Phone,@Address,@LoanType,@LoanAmount,@EmploymentType,@MonthlyIncome,'Pending')";
+                                    (@FullName,@Email,@Phone,@Address,@LoanType,@LoanAmount,@EmploymentType,@MonthlyIncome,'Pending',@documentFile,@TotalAmount)";
 
                         using (MySqlCommand cmd = new MySqlCommand(query, conn))
                         {
@@ -68,6 +70,7 @@
                             cmd.Parameters.AddWithValue("@LoanAmount", loanAmount);
                             cmd.Parameters.AddWithValue("@EmploymentType", employmentType);
                             cmd.Parameters.AddWithValue("@MonthlyIncome", monthlyIncome);
+                            cmd.Parameters.AddWithValue("@documentFile", documentFile);
 
                             int rows = cmd.ExecuteNonQuery();
                             if (rows > 0)
@@ -134,7 +137,17 @@
                 </div>
             </div>
             <div class="form-group"><label>Monthly Income (₹) <span class="required">*</span></label><input type="number" name="monthlyIncome" min="10000" step="1000" required /></div>
+            <form method="post" enctype="multipart/form-data">
+    
+    <div class="form-group">
+        <label>Upload Document (PDF/Image) <span class="required">*</span></label>
+        <input type="file" name="document" accept=".pdf,.jpg,.jpeg,.png" required />
+    </div>
+    
+</form>
+
             <button type="submit" class="btn-submit">Submit Application</button>
+
         </form>
     </div>
 </body>

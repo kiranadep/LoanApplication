@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 
 namespace LoanApplication.Loans
 {
-    public partial class userview : System.Web.UI.Page
+    public partial class yourapp : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
