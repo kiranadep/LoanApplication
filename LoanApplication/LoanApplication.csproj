@@ -129,6 +129,7 @@
     <Content Include="Global.asax" />
     <Content Include="Loans\Loan.aspx" />
     <Content Include="Loans\userview.aspx" />
+    <Content Include="Loans\yourapp.aspx" />
     <Content Include="User\login.aspx" />
     <Content Include="User\Register.aspx" />
     <Content Include="Web.config" />
@@ -199,6 +200,13 @@
     </Compile>
     <Compile Include="Loans\userview.aspx.designer.cs">
       <DependentUpon>userview.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Loans\yourapp.aspx.cs">
+      <DependentUpon>yourapp.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Loans\yourapp.aspx.designer.cs">
+      <DependentUpon>yourapp.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="User\login.aspx.cs">

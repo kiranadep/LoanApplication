@@ -79,7 +79,20 @@
 
             if (Request.HttpMethod == "POST")
             {
+<<<<<<< HEAD
                 string action = Request.Form["action"];
+=======
+                string fullName = Request.Form["fullName"];
+                string email = Request.Form["email"];
+                string phone = Request.Form["phone"];
+                string address = Request.Form["address"];
+                string loanType = Request.Form["loanType"];
+                decimal loanAmount = Convert.ToDecimal(Request.Form["loanAmount"]);
+                string employmentType = Request.Form["employmentType"];
+                decimal monthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
+                HttpPostedFile documentFile = Request.Files["document"];
+
+>>>>>>> 4aad3f1f8e611cc13e34872704cb8c8df6fa8440
 
                 if (action == "calculate")
                 {
@@ -122,6 +135,7 @@
                 {
                     try
                     {
+<<<<<<< HEAD
                         string fullName = Request.Form["fullName"];
                         string email = Request.Form["email"];
                         string phone = Request.Form["phone"];
@@ -130,6 +144,13 @@
                         decimal loanAmount = Convert.ToDecimal(Request.Form["loanAmount"]);
                         string employmentType = Request.Form["employmentType"];
                         decimal monthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
+=======
+                        conn.Open();
+                        string query = @"INSERT INTO LoanApplications 
+                                    (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, Status,documentFile,TotalAmount)
+                                    VALUES
+                                    (@FullName,@Email,@Phone,@Address,@LoanType,@LoanAmount,@EmploymentType,@MonthlyIncome,'Pending',@documentFile,@TotalAmount)";
+>>>>>>> 4aad3f1f8e611cc13e34872704cb8c8df6fa8440
 
                         if (ViewState["TotalAmount"] != null)
                             TotalAmount = Convert.ToDecimal(ViewState["TotalAmount"]);
@@ -155,8 +176,12 @@
                             cmd.Parameters.AddWithValue("@LoanAmount", loanAmount);
                             cmd.Parameters.AddWithValue("@EmploymentType", employmentType);
                             cmd.Parameters.AddWithValue("@MonthlyIncome", monthlyIncome);
+<<<<<<< HEAD
                             cmd.Parameters.AddWithValue("@TotalAmount", TotalAmount);
                             //cmd.Parameters.AddWithValue("@Document", documentBytes); // if you are uploading a file
+=======
+                            cmd.Parameters.AddWithValue("@documentFile", documentFile);
+>>>>>>> 4aad3f1f8e611cc13e34872704cb8c8df6fa8440
 
                             cmd.ExecuteNonQuery();
                         }
@@ -233,6 +258,7 @@
                     </select>
                 </div>
             </div>
+<<<<<<< HEAD
 
             <div class="form-group">
                 <label>Monthly Income (₹) <span class="required">*</span></label>
@@ -257,6 +283,20 @@
                
                 <button type="submit" name="action" value="submit" class="btn-submit">Submit Application</button>
             </div>
+=======
+            <div class="form-group"><label>Monthly Income (₹) <span class="required">*</span></label><input type="number" name="monthlyIncome" min="10000" step="1000" required /></div>
+            <form method="post" enctype="multipart/form-data">
+    
+    <div class="form-group">
+        <label>Upload Document (PDF/Image) <span class="required">*</span></label>
+        <input type="file" name="document" accept=".pdf,.jpg,.jpeg,.png" required />
+    </div>
+    
+</form>
+
+            <button type="submit" class="btn-submit">Submit Application</button>
+
+>>>>>>> 4aad3f1f8e611cc13e34872704cb8c8df6fa8440
         </form>
     </div>
 </body>

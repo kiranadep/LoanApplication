@@ -1,5 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="userview.aspx.cs" Inherits="LoanApplication.Loans.userview" %>
-
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="userview.aspx.cs" Inherits="LoanApplication.Loans.userview3" %>
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="MySql.Data.MySqlClient" %>
 
@@ -19,6 +18,8 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 100;
         }
         .logo { font-size: 28px; font-weight: bold; background: linear-gradient(135deg, #1e3c72, #7e22ce); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .auth-buttons { display: flex; gap: 15px; align-items: center; }
@@ -30,6 +31,109 @@
         .btn-signup:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3); }
         .btn-logout { background: #dc3545; color: white; }
         .btn-logout:hover { background: #c82333; transform: translateY(-2px); }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.2);
+            transition: left 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 998;
+        }
+        .sidebar-overlay.active { display: block; }
+        .menu-toggle {
+            position: fixed;
+            left: 20px;
+            top: 90px;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            z-index: 101;
+        }
+        .menu-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .menu-toggle span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background: #1e3c72;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .menu-toggle span::before, .menu-toggle span::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 3px;
+            background: #1e3c72;
+            left: 0;
+            transition: all 0.3s;
+        }
+        .menu-toggle span::before { top: -8px; }
+        .menu-toggle span::after { top: 8px; }
+        .menu-toggle.active span { background: transparent; }
+        .menu-toggle.active span::before { top: 0; transform: rotate(45deg); }
+        .menu-toggle.active span::after { top: 0; transform: rotate(-45deg); }
+        
+        .sidebar-header {
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #7e22ce 100%);
+            color: white;
+        }
+        .sidebar-header h2 { font-size: 22px; margin-bottom: 5px; }
+        .sidebar-header p { font-size: 14px; opacity: 0.9; }
+        
+        .sidebar-menu { list-style: none; padding: 20px 0; }
+        .sidebar-menu li { padding: 0; }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 18px 25px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: #f8f9fa;
+            border-left-color: #7e22ce;
+            padding-left: 30px;
+        }
+        .sidebar-menu a.active {
+            background: linear-gradient(90deg, #f0f4ff 0%, #fff 100%);
+            border-left-color: #1e3c72;
+            color: #1e3c72;
+            font-weight: 600;
+        }
+        .sidebar-menu .menu-icon {
+            font-size: 20px;
+            margin-right: 15px;
+            width: 24px;
+            text-align: center;
+        }
 
         .hero { text-align: center; padding: 60px 20px; color: white; }
         .hero h1 { font-size: 48px; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
@@ -62,10 +166,41 @@
         .highlight-box h3 { color: #1e3c72; margin-bottom: 10px; font-size: 18px; }
         .btn-apply { width: 100%; padding: 15px; background: linear-gradient(135deg, #1e3c72 0%, #7e22ce 100%); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 25px; transition: all 0.3s; }
         .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(30, 60, 114, 0.4); }
+
     </style>
 </head>
 <body>
     <form id="form1" runat="server">
+        <!-- Menu Toggle Button -->
+        <div class="menu-toggle" onclick="toggleSidebar()">
+            <span></span>
+        </div>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>💰 LoanHub</h2>
+                <p>Your Financial Partner</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="../Loans/yourapp.aspx">
+                        <span class="menu-icon">📋</span>
+                        <span>Your Applications</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../About/AboutUs.aspx">
+                        <span class="menu-icon">ℹ️</span>
+                        <span>About Us</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
         <!-- Header -->
         <div class="header">
             <div class="logo">💰 LoanHub</div>
@@ -170,8 +305,19 @@
         </div>
 
         <script>
+            function toggleSidebar() {
+                var sidebar = document.querySelector('.sidebar');
+                var overlay = document.querySelector('.sidebar-overlay');
+                var toggle = document.querySelector('.menu-toggle');
+
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+                toggle.classList.toggle('active');
+            }
+
             function openModal(id) { document.getElementById(id).style.display = "block"; }
             function closeModal(id) { document.getElementById(id).style.display = "none"; }
+
             window.onclick = function (event) {
                 var modals = document.getElementsByClassName("modal");
                 for (var i = 0; i < modals.length; i++) {
