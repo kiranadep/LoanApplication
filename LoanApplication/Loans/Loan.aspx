@@ -26,9 +26,7 @@
             border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        .alert-custom {
-            margin-bottom: 20px;
-        }
+        .alert-custom { margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -38,10 +36,20 @@
         <%
             string alert = "";
             string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
-            string payableMessage = "";
             decimal TotalAmount = 0;
             decimal interestRate = 0;
-            int months = 12; // Default 12 months
+            int months = 12;
+            string payableMessage = "";
+
+            // Load hidden fields if page was posted
+            if(!string.IsNullOrEmpty(Request.Form["totalAmountHidden"]))
+                decimal.TryParse(Request.Form["totalAmountHidden"], out TotalAmount);
+
+            if(!string.IsNullOrEmpty(Request.Form["interestRateHidden"]))
+                decimal.TryParse(Request.Form["interestRateHidden"], out interestRate);
+
+            if(!string.IsNullOrEmpty(Request.Form["monthsHidden"]))
+                int.TryParse(Request.Form["monthsHidden"], out months);
 
             if (Request.HttpMethod == "POST")
             {
@@ -51,7 +59,6 @@
                 {
                     string loanType = Request.Form["loanType"];
                     decimal amount = 0;
-
                     if (!string.IsNullOrEmpty(Request.Form["loanAmount"]))
                         amount = Convert.ToDecimal(Request.Form["loanAmount"]);
 
@@ -78,10 +85,6 @@
                             payableMessage = "❌ No matching loan type found.";
                         }
                     }
-
-                    ViewState["TotalAmount"] = TotalAmount;
-                    ViewState["InterestRate"] = interestRate;
-                    ViewState["Months"] = months;
                 }
 
                 else if (action == "submit")
@@ -96,42 +99,45 @@
                         decimal loanAmount = Convert.ToDecimal(Request.Form["loanAmount"]);
                         string employmentType = Request.Form["employmentType"];
                         decimal monthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
+
+                        // read hidden TotalAmount
+                        decimal.TryParse(Request.Form["totalAmountHidden"], out TotalAmount);
+
                         HttpPostedFile documentFile = Request.Files["document"];
-
-                        if (ViewState["TotalAmount"] != null)
-                            TotalAmount = Convert.ToDecimal(ViewState["TotalAmount"]);
-
-                        byte[] documentBytes = null;
-                        if (documentFile != null && documentFile.ContentLength > 0)
+                        if (documentFile == null || documentFile.ContentLength == 0)
                         {
-                            documentBytes = new byte[documentFile.ContentLength];
+                            alert = "<div class='alert alert-danger alert-custom'>Please upload document!</div>";
+                        }
+                        else
+                        {
+                            byte[] documentBytes = new byte[documentFile.ContentLength];
                             documentFile.InputStream.Read(documentBytes, 0, documentFile.ContentLength);
+
+                            using (MySqlConnection conn = new MySqlConnection(connStr))
+                            {
+                                conn.Open();
+                                string query = @"INSERT INTO LoanApplications 
+                                    (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, TotalAmount, Status, AppliedAt, Document)
+                                    VALUES
+                                    (@FullName, @Email, @Phone, @Address, @LoanType, @LoanAmount, @EmploymentType, @MonthlyIncome, @TotalAmount, 'Pending', NOW(), @Document)";
+
+                                MySqlCommand cmd = new MySqlCommand(query, conn);
+                                cmd.Parameters.AddWithValue("@FullName", fullName);
+                                cmd.Parameters.AddWithValue("@Email", email);
+                                cmd.Parameters.AddWithValue("@Phone", phone);
+                                cmd.Parameters.AddWithValue("@Address", address);
+                                cmd.Parameters.AddWithValue("@LoanType", loanType);
+                                cmd.Parameters.AddWithValue("@LoanAmount", loanAmount);
+                                cmd.Parameters.AddWithValue("@EmploymentType", employmentType);
+                                cmd.Parameters.AddWithValue("@MonthlyIncome", monthlyIncome);
+                                cmd.Parameters.AddWithValue("@TotalAmount", TotalAmount);
+                                cmd.Parameters.AddWithValue("@Document", documentBytes);
+
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            alert = "<div class='alert alert-success alert-custom'>✓ Application submitted successfully!</div>";
                         }
-
-                        using (MySqlConnection conn = new MySqlConnection(connStr))
-                        {
-                            conn.Open();
-                            string query = @"INSERT INTO LoanApplications 
-                                (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, TotalAmount, Status, AppliedAt, Document)
-                                VALUES
-                                (@FullName, @Email, @Phone, @Address, @LoanType, @LoanAmount, @EmploymentType, @MonthlyIncome, @TotalAmount, 'Pending', NOW(), @Document)";
-
-                            MySqlCommand cmd = new MySqlCommand(query, conn);
-                            cmd.Parameters.AddWithValue("@FullName", fullName);
-                            cmd.Parameters.AddWithValue("@Email", email);
-                            cmd.Parameters.AddWithValue("@Phone", phone);
-                            cmd.Parameters.AddWithValue("@Address", address);
-                            cmd.Parameters.AddWithValue("@LoanType", loanType);
-                            cmd.Parameters.AddWithValue("@LoanAmount", loanAmount);
-                            cmd.Parameters.AddWithValue("@EmploymentType", employmentType);
-                            cmd.Parameters.AddWithValue("@MonthlyIncome", monthlyIncome);
-                            cmd.Parameters.AddWithValue("@TotalAmount", TotalAmount);
-                            cmd.Parameters.AddWithValue("@Document", documentBytes);
-
-                            cmd.ExecuteNonQuery();
-                        }
-
-                        alert = "<div class='alert alert-success alert-custom'>✓ Application submitted successfully!</div>";
                     }
                     catch (Exception ex)
                     {
@@ -145,7 +151,6 @@
                 Response.Write("<div class='alert alert-success alert-custom'>" + payableMessage + "</div>");
         %>
 
-        <!-- Main Form -->
         <form method="post" enctype="multipart/form-data">
             <div class="row mb-3">
                 <div class="col">
@@ -213,7 +218,10 @@
                 <input type="file" class="form-control" name="document" accept=".pdf,.jpg,.jpeg,.png" required />
             </div>
 
-            <input type="hidden" name="months" value="12" />
+            <!-- Hidden Fields for Calculated Values -->
+            <input type="hidden" name="totalAmountHidden" value="<%= TotalAmount %>" />
+            <input type="hidden" name="interestRateHidden" value="<%= interestRate %>" />
+            <input type="hidden" name="monthsHidden" value="<%= months %>" />
 
             <div class="row mb-3">
                 <div class="col">
