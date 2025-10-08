@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="userview3.aspx.cs" Inherits="LoanApplication.Loans.userview3" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="userview.aspx.cs" Inherits="LoanApplication.Loans.userview3" %>
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="MySql.Data.MySqlClient" %>
 
@@ -225,7 +225,7 @@
             {
                 Session.Clear();
                 Session.Abandon();
-                Response.Redirect("userview3.aspx");
+                Response.Redirect("userview.aspx");
             }
         %>
 

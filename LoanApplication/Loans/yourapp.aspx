@@ -17,38 +17,54 @@
 </tr>
 <%
 string connString = System.Configuration.ConfigurationManager.ConnectionStrings["LoanAppDB"].ConnectionString;
-
-// Assuming user email is stored in session after login
 string userEmail = Session["UserEmail"] as string;
 
+// ✅ Handle deletion if deleteId is present
+string deleteId = Request.QueryString["deleteId"];
+if (!string.IsNullOrEmpty(deleteId) && !string.IsNullOrEmpty(userEmail))
+{
+    using (MySqlConnection conn = new MySqlConnection(connString))
+    {
+        conn.Open();
+        MySqlCommand deleteCmd = new MySqlCommand("DELETE FROM LoanApplications WHERE ApplicationId = @ApplicationId AND Email = @Email", conn);
+        deleteCmd.Parameters.AddWithValue("@ApplicationId", deleteId);
+        deleteCmd.Parameters.AddWithValue("@Email", userEmail);
+        deleteCmd.ExecuteNonQuery();
+    }
+
+    // ✅ Redirect to refresh the page without query string
+    Response.Redirect("yourapp.aspx");
+}
+
+// ✅ Display applications
 if (!string.IsNullOrEmpty(userEmail))
 {
     using (MySqlConnection conn = new MySqlConnection(connString))
     {
         conn.Open();
-        MySqlCommand cmd = new MySqlCommand("SELECT LoanType, LoanAmount, Status FROM LoanApplications WHERE Email = @Email", conn);
+        MySqlCommand cmd = new MySqlCommand("SELECT ApplicationId, LoanType, LoanAmount, Status FROM LoanApplications WHERE Email = @Email", conn);
         cmd.Parameters.AddWithValue("@Email", userEmail);
 
         MySqlDataReader reader = cmd.ExecuteReader();
         while (reader.Read())
         {
-            Response.Write("<tr>");
-            Response.Write("<td>" + reader["LoanType"] + "</td>");
-            Response.Write("<td>" + reader["LoanAmount"] + "</td>");
-            Response.Write("<td>" + reader["Status"] + "</td>");
-%>
-            <td>
-                <a href="yourapp.aspx" class="btn btn-outline-danger">Delete</a>
-            </td>
+            string appId = reader["ApplicationId"].ToString();
+            string loanType = reader["LoanType"].ToString();
+            string loanAmount = reader["LoanAmount"].ToString();
+            string status = reader["Status"].ToString();
 
- <%             
+            Response.Write("<tr>");
+            Response.Write("<td>" + loanType + "</td>");
+            Response.Write("<td>" + loanAmount + "</td>");
+            Response.Write("<td>" + status + "</td>");
+            Response.Write("<td><a href='yourapp.aspx?deleteId=" + appId + "' class='btn btn-outline-danger'>Delete</a></td>");
             Response.Write("</tr>");
         }
     }
 }
 else
 {
-    Response.Write("<tr><td colspan='3' style='text-align:center;color:red;'>Please log in to view your application details.</td></tr>");
+    Response.Write("<tr><td colspan='4' style='text-align:center;color:red;'>Please log in to view your application details.</td></tr>");
 }
 %>
 </table>
