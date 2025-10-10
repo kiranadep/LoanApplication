@@ -120,7 +120,6 @@
   <ItemGroup>
     <Content Include="Admin\Admin.aspx" />
     <Content Include="Admin\AdminDashboard.aspx" />
-    <Content Include="Admin\Logout.aspx" />
     <Content Include="Admin\Restore.aspx" />
     <Content Include="Admin\Settings.aspx" />
     <Content Include="Admin\Trash.aspx" />
@@ -148,13 +147,6 @@
     </Compile>
     <Compile Include="Admin\AdminDashboard.aspx.designer.cs">
       <DependentUpon>AdminDashboard.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Admin\Logout.aspx.cs">
-      <DependentUpon>Logout.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Admin\Logout.aspx.designer.cs">
-      <DependentUpon>Logout.aspx</DependentUpon>
     </Compile>
     <Compile Include="Admin\Restore.aspx.cs">
       <DependentUpon>Restore.aspx</DependentUpon>

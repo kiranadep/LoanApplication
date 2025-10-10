@@ -13,5 +13,17 @@ namespace LoanApplication.Admin
         {
 
         }
+        protected void btnLogout_Click(object sender, EventArgs e)
+        {
+            // Clear all session data
+            Session.Clear();
+
+            // Optionally, end the session completely
+            Session.Abandon();
+
+            // Redirect to admin login page
+            Response.Redirect("~/Admin/Admin.aspx");
+        }
+
     }
 }

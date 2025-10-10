@@ -8,14 +8,50 @@
 <head runat="server">
     <title>Admin Login - Loan Application</title>
     <style>
-        body { font-family: Arial; background: #f0f2f5; }
-        .login-box { width: 350px; margin: 120px auto; padding: 30px;
-            background: #fff; border-radius: 10px; box-shadow: 0px 0px 8px #888;}
-        .login-box h2 { text-align: center; margin-bottom: 20px; color: #444; }
-        .form-control { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
-        .btn-login { width: 100%; padding: 10px; background: #0078d7; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        .btn-login:hover { background: #005a9e; }
-        .error { color: red; text-align: center; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+        .login-box {
+            width: 350px;
+            margin: 120px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 8px #888;
+        }
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #444;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 10px;
+            background: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-login:hover {
+            background: #005a9e;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -37,12 +73,14 @@
                     }
                     else
                     {
-                        // MySQL Connection string from Railway
+                        // MySQL connection string (defined in Web.config)
                         string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
 
                         using (MySqlConnection con = new MySqlConnection(connStr))
                         {
-                            string query = "SELECT COUNT(*) FROM Admin WHERE Username=@uname AND Password=@pwd";
+                            // ✅ Case-sensitive comparison using BINARY
+                            string query = "SELECT COUNT(*) FROM Admin WHERE BINARY Username=@uname AND BINARY Password=@pwd";
+
                             using (MySqlCommand cmd = new MySqlCommand(query, con))
                             {
                                 cmd.Parameters.AddWithValue("@uname", username);

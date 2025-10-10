@@ -7,7 +7,14 @@
     {
         Response.Redirect("Admin.aspx");
     }
-    else
+
+    // ===== Logout functionality =====
+    if (Request.QueryString["logout"] == "true")
+    {
+        Session.Clear();
+        Session.Abandon();
+        Response.Redirect("Admin.aspx");
+    }
 
 %>
 <!DOCTYPE html>
@@ -65,7 +72,7 @@
         <a href="Users.aspx">View Users</a>
         <a href="Trash.aspx">🗑 Bin</a>
         <a href="Settings.aspx">⚙️ Settings</a>
-        <a href="#">Logout</a>  
+        <a href="AdminDashboard.aspx?logout=true" style="background:#dc3545;">🚪 Logout</a>
     </div>
 
     <div class="main-content">
