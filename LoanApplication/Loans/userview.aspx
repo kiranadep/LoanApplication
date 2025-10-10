@@ -117,10 +117,13 @@
                                                 <li>Tenure: <%=reader["Tenure"].ToString()%></li>
                                             </ul>
                                             <% if (isLoggedIn) { %>
-                                                <button type="button" class="btn-apply" 
-                                                        onclick="window.location.href='../Loans/Loan.aspx?loan=<%=loanId%>'">
-                                                    Apply Now
+                                                <button type="button" class="btn-apply"
+                                                    onclick="window.location.href='../Loans/Loan.aspx?loanType=<%=Server.UrlEncode(loanName)%>'">
+                                                     Apply Now
                                                 </button>
+
+
+                                                
                                             <% } else { %>
                                                 <button type="button" class="btn-apply" 
                                                         onclick="alert('You must login first to apply for a loan'); window.location.href='../user/login.aspx';">

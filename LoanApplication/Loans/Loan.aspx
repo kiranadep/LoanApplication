@@ -18,190 +18,233 @@
 <div class="container container-custom">
     <h1 class="text-center text-primary mb-4">Loan Application</h1>
 
-    <%
-        string alert = "";
-        string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
-        decimal TotalAmount = 0;
-        decimal interestRate = 0;
-        int months = 12;
-        string payableMessage = "";
-        string TotalMOnths = "0";
-        string deadline = "01/01/2027";
-        decimal monthlyPayable = 0;
+<%
+    // =========================
+    //  Autofill user info
+    // =========================
+    string fullName = "";
+    string email = "";
+    string phone = "";
+    string address = "";
+    string employmentType = "";
+    string monthlyIncome = "";
 
-        // Load hidden fields if page was posted
-        decimal.TryParse(Request.Form["totalAmountHidden"], out TotalAmount);
-        decimal.TryParse(Request.Form["interestRateHidden"], out interestRate);
-        int.TryParse(Request.Form["monthsHidden"], out months);
-        decimal.TryParse(Request.Form["monthlyPayableHidden"], out monthlyPayable);
-        deadline = Request.Form["deadlineHidden"];
+    string connStr = ConfigurationManager.ConnectionStrings["LoanAppDB"]?.ConnectionString;
 
-        if (Request.HttpMethod == "POST")
+    if (Session["UserEmail"] != null)
+    {
+        using (MySqlConnection con = new MySqlConnection(connStr))
         {
-            string action = Request.Form["action"];
+            con.Open();
+            string query = "SELECT FullName, Email, Phone, Address, Occupation, MonthlyIncome FROM Users WHERE Email=@Email";
+            MySqlCommand cmd = new MySqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@Email", Session["UserEmail"].ToString());
 
-            if (action == "calculate")
+            using (MySqlDataReader reader = cmd.ExecuteReader())
             {
-                string loanType = Request.Form["loanType"];
-                decimal amount = 0;
-                decimal.TryParse(Request.Form["loanAmount"], out amount);
-
-                using (MySqlConnection con = new MySqlConnection(connStr))
+                if (reader.Read())
                 {
-                    con.Open();
-                    string q = "SELECT InterestRate FROM LoanTypes WHERE LoanName=@LoanType";
-                    MySqlCommand cmd = new MySqlCommand(q, con);
-                    cmd.Parameters.AddWithValue("@LoanType", loanType);
-                    object result = cmd.ExecuteScalar();
-
-                    if (result != null)
-                    {
-                        interestRate = Convert.ToDecimal(result);
-
-                        // Set months based on loan amount
-                        if (amount < 50000) months = 6;
-                        else if (amount < 200000) months = 12;
-                        else if (amount < 500000) months = 24;
-                        else if (amount < 2000000) months = 36;
-                        else if (amount < 5000000) months = 60;
-                        else months = 84;
-
-                        // EMI Calculation
-                        decimal monthlyRate = interestRate / 12 / 100;
-                        monthlyPayable = (amount * monthlyRate * (decimal)Math.Pow((double)(1 + monthlyRate), months))
-                                        / (decimal)(Math.Pow((double)(1 + monthlyRate), months) - 1);
-                        monthlyPayable = Math.Round(monthlyPayable, 2);  // <-- Round to 2 decimals
-
-                        TotalAmount = monthlyPayable * months;
-                        TotalAmount = Math.Round(TotalAmount, 2);  // <-- Round to 2 decimals
-
-                        // Deadline (today + months)
-                        DateTime deadlineDate = DateTime.Now.AddMonths(months);
-                        deadline = deadlineDate.ToString("dd-MMM-yyyy");
-
-                        payableMessage = $"₹{Math.Round(TotalAmount,2)}";
-                        TotalMOnths = $"{months} months (Deadline: {deadline})";
-                    }
-                    else
-                    {
-                        payableMessage = "❌ No matching loan type found.";
-                    }
-                }
-            }
-            else if (action == "submit")
-            {
-                try
-                {
-                    string fullName = Request.Form["fullName"];
-                    string email = Request.Form["email"];
-                    string phone = Request.Form["phone"];
-                    string address = Request.Form["address"];
-                    string loanType = Request.Form["loanType"];
-                    decimal loanAmount = Convert.ToDecimal(Request.Form["loanAmount"]);
-                    string employmentType = Request.Form["employmentType"];
-                    decimal monthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
-
-                    decimal.TryParse(Request.Form["totalAmountHidden"], out TotalAmount);
-                    decimal.TryParse(Request.Form["monthlyPayableHidden"], out monthlyPayable);
-                    int.TryParse(Request.Form["monthsHidden"], out months);
-                    deadline = Request.Form["deadlineHidden"];
-
-                    HttpPostedFile documentFile = Request.Files["document"];
-                    if (documentFile == null || documentFile.ContentLength == 0)
-                    {
-                        alert = "<div class='alert alert-danger alert-custom'>Please upload document!</div>";
-                    }
-                    else
-                    {
-                        byte[] documentBytes = new byte[documentFile.ContentLength];
-                        documentFile.InputStream.Read(documentBytes, 0, documentFile.ContentLength);
-
-                        using (MySqlConnection conn = new MySqlConnection(connStr))
-                        {
-                            conn.Open();
-                            string query = @"INSERT INTO LoanApplications 
-                                (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, 
-                                TotalAmount, Deadline, DurationMonths, MonthlyPayable, Status, AppliedAt, Document)
-                                VALUES
-                                (@FullName, @Email, @Phone, @Address, @LoanType, @LoanAmount, @EmploymentType, @MonthlyIncome, 
-                                @TotalAmount, @Deadline, @DurationMonths, @MonthlyPayable, 'Pending', NOW(), @Document)";
-                            
-                            MySqlCommand cmd = new MySqlCommand(query, conn);
-                            cmd.Parameters.AddWithValue("@FullName", fullName);
-                            cmd.Parameters.AddWithValue("@Email", email);
-                            cmd.Parameters.AddWithValue("@Phone", phone);
-                            cmd.Parameters.AddWithValue("@Address", address);
-                            cmd.Parameters.AddWithValue("@LoanType", loanType);
-                            cmd.Parameters.AddWithValue("@LoanAmount", loanAmount);
-                            cmd.Parameters.AddWithValue("@EmploymentType", employmentType);
-                            cmd.Parameters.AddWithValue("@MonthlyIncome", monthlyIncome);
-                            cmd.Parameters.AddWithValue("@TotalAmount", Math.Round(TotalAmount,2));
-                            cmd.Parameters.AddWithValue("@Deadline", deadline);
-                            cmd.Parameters.AddWithValue("@DurationMonths", months);
-                            cmd.Parameters.AddWithValue("@MonthlyPayable", Math.Round(monthlyPayable, 2));
-                            cmd.Parameters.AddWithValue("@Document", documentBytes);
-                            cmd.ExecuteNonQuery();
-                        }
-
-                        alert = "<div class='alert alert-success alert-custom'>✓ Application submitted successfully!</div>";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    alert = "<div class='alert alert-danger alert-custom'>✗ Error: " + ex.Message + "</div>";
+                    fullName = reader["FullName"].ToString();
+                    email = reader["Email"].ToString();
+                    phone = reader["Phone"].ToString();
+                    address = reader["Address"].ToString();
+                    employmentType = reader["Occupation"].ToString();
+                    monthlyIncome = reader["MonthlyIncome"].ToString();
                 }
             }
         }
+    }
 
-        Response.Write(alert);
-        if (!string.IsNullOrEmpty(payableMessage))
-            Response.Write("<div class='alert alert-success alert-custom'>" + payableMessage + "</div>");
-    %>
+    // Helper to use posted value or autofill fallback
+    string getValue(string key, string fallback) => string.IsNullOrEmpty(Request.Form[key]) ? fallback : Request.Form[key];
+
+    // =========================
+    //  Variables for loan calculation
+    // =========================
+    string alert = "";
+    decimal TotalAmount = 0;
+    decimal interestRate = 0;
+    int months = 12;
+    string payableMessage = "";
+    string TotalMOnths = "";
+    string deadline = "";
+    decimal monthlyPayable = 0;
+
+    string selectedLoanType = Request.QueryString["loanType"];
+
+    // Load hidden fields if page was posted
+    decimal.TryParse(Request.Form["totalAmountHidden"], out TotalAmount);
+    decimal.TryParse(Request.Form["interestRateHidden"], out interestRate);
+    int.TryParse(Request.Form["monthsHidden"], out months);
+    decimal.TryParse(Request.Form["monthlyPayableHidden"], out monthlyPayable);
+    deadline = Request.Form["deadlineHidden"];
+
+    if (Request.HttpMethod == "POST")
+    {
+        string action = Request.Form["action"];
+
+        if (action == "calculate")
+        {
+            string loanType = Request.Form["loanType"];
+            decimal amount = 0;
+            decimal.TryParse(Request.Form["loanAmount"], out amount);
+
+            using (MySqlConnection con = new MySqlConnection(connStr))
+            {
+                con.Open();
+                string q = "SELECT InterestRate FROM LoanTypes WHERE LoanName=@LoanType";
+                MySqlCommand cmd = new MySqlCommand(q, con);
+                cmd.Parameters.AddWithValue("@LoanType", loanType);
+                object result = cmd.ExecuteScalar();
+
+                if (result != null)
+                {
+                    interestRate = Convert.ToDecimal(result);
+
+                    // Set months based on loan amount
+                    if (amount < 50000) months = 6;
+                    else if (amount < 200000) months = 12;
+                    else if (amount < 500000) months = 24;
+                    else if (amount < 2000000) months = 36;
+                    else if (amount < 5000000) months = 60;
+                    else months = 84;
+
+                    // EMI Calculation
+                    decimal monthlyRate = interestRate / 12 / 100;
+                    monthlyPayable = (amount * monthlyRate * (decimal)Math.Pow((double)(1 + monthlyRate), months))
+                                    / (decimal)(Math.Pow((double)(1 + monthlyRate), months) - 1);
+                    monthlyPayable = Math.Round(monthlyPayable, 2);
+
+                    TotalAmount = monthlyPayable * months;
+                    TotalAmount = Math.Round(TotalAmount, 2);
+
+                    DateTime deadlineDate = DateTime.Now.AddMonths(months);
+                    deadline = deadlineDate.ToString("dd-MMM-yyyy");
+
+                    payableMessage = $"₹{TotalAmount:F2}";
+                    TotalMOnths = $"{months} months (Deadline: {deadline})";
+                }
+                else
+                {
+                    payableMessage = "❌ No matching loan type found.";
+                }
+            }
+        }
+        else if (action == "submit")
+        {
+            try
+            {
+                string sFullName = Request.Form["fullName"];
+                string sEmail = Request.Form["email"];
+                string sPhone = Request.Form["phone"];
+                string sAddress = Request.Form["address"];
+                string sLoanType = Request.Form["loanType"];
+                decimal sLoanAmount = Convert.ToDecimal(Request.Form["loanAmount"]);
+                string sEmploymentType = Request.Form["employmentType"];
+                decimal sMonthlyIncome = Convert.ToDecimal(Request.Form["monthlyIncome"]);
+
+                decimal.TryParse(Request.Form["totalAmountHidden"], out TotalAmount);
+                decimal.TryParse(Request.Form["monthlyPayableHidden"], out monthlyPayable);
+                int.TryParse(Request.Form["monthsHidden"], out months);
+                deadline = Request.Form["deadlineHidden"];
+
+                HttpPostedFile documentFile = Request.Files["document"];
+                if (documentFile == null || documentFile.ContentLength == 0)
+                {
+                    alert = "<div class='alert alert-danger alert-custom'>Please upload document!</div>";
+                }
+                else
+                {
+                    byte[] documentBytes = new byte[documentFile.ContentLength];
+                    documentFile.InputStream.Read(documentBytes, 0, documentFile.ContentLength);
+
+                    using (MySqlConnection conn = new MySqlConnection(connStr))
+                    {
+                        conn.Open();
+                        string query = @"INSERT INTO LoanApplications 
+                            (FullName, Email, Phone, Address, LoanType, LoanAmount, EmploymentType, MonthlyIncome, 
+                            TotalAmount, Deadline, DurationMonths, MonthlyPayable, Status, AppliedAt, Document)
+                            VALUES
+                            (@FullName, @Email, @Phone, @Address, @LoanType, @LoanAmount, @EmploymentType, @MonthlyIncome, 
+                            @TotalAmount, @Deadline, @DurationMonths, @MonthlyPayable, 'Pending', NOW(), @Document)";
+
+                        MySqlCommand cmd = new MySqlCommand(query, conn);
+                        cmd.Parameters.AddWithValue("@FullName", sFullName);
+                        cmd.Parameters.AddWithValue("@Email", sEmail);
+                        cmd.Parameters.AddWithValue("@Phone", sPhone);
+                        cmd.Parameters.AddWithValue("@Address", sAddress);
+                        cmd.Parameters.AddWithValue("@LoanType", sLoanType);
+                        cmd.Parameters.AddWithValue("@LoanAmount", sLoanAmount);
+                        cmd.Parameters.AddWithValue("@EmploymentType", sEmploymentType);
+                        cmd.Parameters.AddWithValue("@MonthlyIncome", sMonthlyIncome);
+                        cmd.Parameters.AddWithValue("@TotalAmount", Math.Round(TotalAmount,2));
+                        cmd.Parameters.AddWithValue("@Deadline", deadline);
+                        cmd.Parameters.AddWithValue("@DurationMonths", months);
+                        cmd.Parameters.AddWithValue("@MonthlyPayable", Math.Round(monthlyPayable,2));
+                        cmd.Parameters.AddWithValue("@Document", documentBytes);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    alert = "<div class='alert alert-success alert-custom'>✓ Application submitted successfully!</div>";
+                }
+            }
+            catch (Exception ex)
+            {
+                alert = "<div class='alert alert-danger alert-custom'>✗ Error: " + ex.Message + "</div>";
+            }
+        }
+    }
+
+    Response.Write(alert);
+    if (!string.IsNullOrEmpty(payableMessage))
+        Response.Write("<div class='alert alert-success alert-custom'>" + payableMessage + "</div>");
+%>
 
     <form method="post" enctype="multipart/form-data">
         <div class="row mb-3">
             <div class="col">
                 <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="fullName" value="<%= Request.Form["fullName"] %>" required />
+                <input type="text" class="form-control" name="fullName" value="<%= getValue("fullName", fullName) %>" required />
             </div>
             <div class="col">
                 <label class="form-label">Email <span class="text-danger">*</span></label>
-                <input type="email" class="form-control" name="email" value="<%= Request.Form["email"] %>" required />
+                <input type="email" class="form-control" name="email" value="<%= getValue("email", email) %>" required />
             </div>
         </div>
 
         <div class="row mb-3">
             <div class="col">
                 <label class="form-label">Phone <span class="text-danger">*</span></label>
-                <input type="tel" class="form-control" name="phone" pattern="[0-9]{10}" value="<%= Request.Form["phone"] %>" required />
+                <input type="tel" class="form-control" name="phone" pattern="[0-9]{10}" value="<%= getValue("phone", phone) %>" required />
             </div>
             <div class="col">
                 <label class="form-label">Loan Type <span class="text-danger">*</span></label>
-                <select class="form-select" name="loanType" required>
+                <!-- 🔹 Modified dropdown to preselect loan type from query string -->
+                <select class="form-select" name="loanType" readonly>
                     <option value="">--Select--</option>
-                    <option value="Personal Loan" <%= Request.Form["loanType"] == "Personal Loan" ? "selected" : "" %>>Personal Loan</option>
-                    <option value="Home Loan" <%= Request.Form["loanType"] == "Home Loan" ? "selected" : "" %>>Home Loan</option>
-                    <option value="Car Loan" <%= Request.Form["loanType"] == "Car Loan" ? "selected" : "" %>>Car Loan</option>
-                    <option value="Education Loan" <%= Request.Form["loanType"] == "Education Loan" ? "selected" : "" %>>Education Loan</option>
-                    <option value="Business Loan" <%= Request.Form["loanType"] == "Business Loan" ? "selected" : "" %>>Business Loan</option>
-                    <option value="Gold Loan" <%= Request.Form["loanType"] == "Gold Loan" ? "selected" : "" %>>Gold Loan</option>
+                    <option value="Personal Loan" <%= selectedLoanType=="Personal Loan"?"selected":"" %>>Personal Loan</option>
+                    <option value="Home Loan" <%= selectedLoanType=="Home Loan"?"selected":"" %>>Home Loan</option>
+                    <option value="Car Loan" <%= selectedLoanType=="Car Loan"?"selected":"" %>>Car Loan</option>
+                    <option value="Education Loan" <%= selectedLoanType=="Education Loan"?"selected":"" %>>Education Loan</option>
+                    <option value="Business Loan" <%= selectedLoanType=="Business Loan"?"selected":"" %>>Business Loan</option>
+                    <option value="Gold Loan" <%= selectedLoanType=="Gold Loan"?"selected":"" %>>Gold Loan</option>
                 </select>
             </div>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Address <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" name="address" value="<%= Request.Form["address"] %>" required />
+            <input type="text" class="form-control" name="address" value="<%= getValue("address", address) %>" required />
         </div>
 
         <div class="row mb-3">
             <div class="col">
                 <label class="form-label">Loan Amount (₹) <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" name="loanAmount" min="10000" step="1000" value="<%= Request.Form["loanAmount"] %>" required />
+                <input type="number" class="form-control" name="loanAmount" min="10000" step="1000" value="<%= getValue("loanAmount","") %>" required />
             </div>
             <div class="col">
-                <label class="form-label">Monthly Income (₹) <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" name="monthlyIncome" min="10000" step="1000" value="<%= Request.Form["monthlyIncome"] %>" required />
+                <label class="form-label">Deadline</label>
+                <input type="text" class="form-control" name="deadline" value="<%= deadline %>" readonly />
             </div>
         </div>
 
@@ -221,19 +264,19 @@
                 <label class="form-label">Employment Type <span class="text-danger">*</span></label>
                 <select class="form-select" name="employmentType" required>
                     <option value="">-- Select Occupation --</option>
-                    <option value="Student" <%= Request.Form["employmentType"] == "Student" ? "selected" : "" %>>Student</option>
-                    <option value="Software Developer" <%= Request.Form["employmentType"] == "Software Developer" ? "selected" : "" %>>Software Developer</option>
-                    <option value="Teacher" <%= Request.Form["employmentType"] == "Teacher" ? "selected" : "" %>>Teacher</option>
-                    <option value="Doctor" <%= Request.Form["employmentType"] == "Doctor" ? "selected" : "" %>>Doctor</option>
-                    <option value="Business Owner" <%= Request.Form["employmentType"] == "Business Owner" ? "selected" : "" %>>Business Owner</option>
-                    <option value="Housewife" <%= Request.Form["employmentType"] == "Housewife" ? "selected" : "" %>>Housewife</option>
-                    <option value="Freelancer" <%= Request.Form["employmentType"] == "Freelancer" ? "selected" : "" %>>Freelancer</option>
-                    <option value="Other" <%= Request.Form["employmentType"] == "Other" ? "selected" : "" %>>Other</option>
+                    <option value="Student" <%= getValue("employmentType", employmentType) == "Student" ? "selected" : "" %>>Student</option>
+                    <option value="Software Developer" <%= getValue("employmentType", employmentType) == "Software Developer" ? "selected" : "" %>>Software Developer</option>
+                    <option value="Teacher" <%= getValue("employmentType", employmentType) == "Teacher" ? "selected" : "" %>>Teacher</option>
+                    <option value="Doctor" <%= getValue("employmentType", employmentType) == "Doctor" ? "selected" : "" %>>Doctor</option>
+                    <option value="Business Owner" <%= getValue("employmentType", employmentType) == "Business Owner" ? "selected" : "" %>>Business Owner</option>
+                    <option value="Housewife" <%= getValue("employmentType", employmentType) == "Housewife" ? "selected" : "" %>>Housewife</option>
+                    <option value="Freelancer" <%= getValue("employmentType", employmentType) == "Freelancer" ? "selected" : "" %>>Freelancer</option>
+                    <option value="Other" <%= getValue("employmentType", employmentType) == "Other" ? "selected" : "" %>>Other</option>
                 </select>
             </div>
             <div class="col">
-                <label class="form-label">Deadline</label>
-                <input type="text" class="form-control" name="deadline" value="<%= deadline %>" readonly />
+                <label class="form-label">Monthly Income (₹) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" name="monthlyIncome" min="10000" step="1000" value="<%= getValue("monthlyIncome", monthlyIncome) %>" required />
             </div>
         </div>
 
