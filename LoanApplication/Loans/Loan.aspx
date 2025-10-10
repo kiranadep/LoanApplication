@@ -25,8 +25,8 @@
         decimal interestRate = 0;
         int months = 12;
         string payableMessage = "";
-        string TotalMOnths = "";
-        string deadline = "";
+        string TotalMOnths = "0";
+        string deadline = "01/01/2027";
         decimal monthlyPayable = 0;
 
         // Load hidden fields if page was posted
@@ -200,8 +200,8 @@
                 <input type="number" class="form-control" name="loanAmount" min="10000" step="1000" value="<%= Request.Form["loanAmount"] %>" required />
             </div>
             <div class="col">
-                <label class="form-label">Deadline</label>
-                <input type="text" class="form-control" name="deadline" value="<%= deadline %>" readonly />
+                <label class="form-label">Monthly Income (₹) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" name="monthlyIncome" min="10000" step="1000" value="<%= Request.Form["monthlyIncome"] %>" required />
             </div>
         </div>
 
@@ -232,8 +232,8 @@
                 </select>
             </div>
             <div class="col">
-                <label class="form-label">Monthly Income (₹) <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" name="monthlyIncome" min="10000" step="1000" value="<%= Request.Form["monthlyIncome"] %>" required />
+                <label class="form-label">Deadline</label>
+                <input type="text" class="form-control" name="deadline" value="<%= deadline %>" readonly />
             </div>
         </div>
 
