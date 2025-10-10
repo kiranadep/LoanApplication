@@ -46,7 +46,7 @@
             <div class="auth-buttons">
                 <%
                     bool isLoggedIn = Session["UserID"] != null;
-                    string userName = Session["UserName"] != null ? Session["UserName"].ToString() : "";
+                    string userName = Session["UserName"] != null ? Session["UserName"].ToString() : ""; //Ternary operator
                     if (isLoggedIn)
                     {
                 %>
